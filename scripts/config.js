@@ -61,7 +61,61 @@ export const CHAT_CONFIG = {
   },
 };
 
-export const CATEGORIES = [
+// Default categories
+const DEFAULT_CATEGORIES = [
   { value: "martin", label: "Martín" },
   { value: "ale_bre", label: "Alessandro" },
 ];
+
+const STORAGE_KEY = 'sabbi_chat_categories';
+
+// Load categories from localStorage or use defaults
+export function getCategories() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error('Error loading categories from localStorage:', error);
+  }
+  return DEFAULT_CATEGORIES;
+}
+
+// Save categories to localStorage
+export function saveCategories(categories) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(categories));
+    return true;
+  } catch (error) {
+    console.error('Error saving categories to localStorage:', error);
+    return false;
+  }
+}
+
+// Add a new category
+export function addCategory(label) {
+  const categories = getCategories();
+  const value = label.toLowerCase().replace(/\s+/g, '-');
+  
+  // Check if category already exists
+  if (categories.some(cat => cat.value === value)) {
+    return { success: false, message: 'Category already exists' };
+  }
+  
+  const newCategory = { value, label };
+  categories.push(newCategory);
+  
+  if (saveCategories(categories)) {
+    return { success: true, category: newCategory };
+  }
+  
+  return { success: false, message: 'Failed to save category' };
+}
+
+// Initialize categories in localStorage if not present
+export function initializeCategories() {
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    saveCategories(DEFAULT_CATEGORIES);
+  }
+}

@@ -2,6 +2,7 @@
    MAIN APPLICATION
    ============================================ */
 
+import { initializeCategories } from './config.js';
 import { renderHeader } from './components/header.js';
 import { renderInfoCard } from './components/infoCard.js';
 import { renderModal, openModal } from './components/modal.js';
@@ -9,6 +10,9 @@ import { initializeChat } from './chat.js';
 
 // Initialize application
 function init() {
+  // Initialize categories in localStorage
+  initializeCategories();
+  
   // Render components
   renderHeader();
   renderInfoCard();

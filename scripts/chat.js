@@ -49,7 +49,7 @@ export async function initializeChat(category) {
       callbackRegistry: "myChatCallbacks",
       metadata: {
         n8nchatui: {
-          sessionKey: `support-page-${category}`,
+          sessionKey: `${category}-session`,
         },
         category: category,
         pageType: "help",

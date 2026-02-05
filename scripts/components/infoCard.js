@@ -5,7 +5,7 @@
 export function renderInfoCard() {
   const template = `
     <div class="info-card">
-      <h2>¿Cómo funciona?</h2>
+      <h2>Como empezar:</h2>
       <ul class="info-list">
         <li class="info-item">
           <div class="info-number">1</div>
@@ -13,11 +13,11 @@ export function renderInfoCard() {
         </li>
         <li class="info-item">
           <div class="info-number">2</div>
-          <div class="info-text">Selecciona la categoría que mejor describe tu consulta</div>
+          <div class="info-text">Selecciona tu sesión o crea una nueva</div>
         </li>
         <li class="info-item">
           <div class="info-number">3</div>
-          <div class="info-text">Haz clic en "Continuar" para iniciar la conversación con Sabbi</div>
+          <div class="info-text">Haz clic en "Continuar" para iniciar la conversación con Sabbi Wan Kenobi</div>
         </li>
       </ul>
     </div>

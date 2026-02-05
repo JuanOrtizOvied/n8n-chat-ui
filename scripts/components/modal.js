@@ -2,23 +2,26 @@
    MODAL COMPONENT
    ============================================ */
 
-import { CATEGORIES } from '../config.js';
+import { getCategories, addCategory } from '../config.js';
 import { state, setState } from '../state.js';
 
 let comboboxOpen = false;
+let currentCategories = [];
 
 export function renderModal() {
+  currentCategories = getCategories();
+  
   const template = `
     <div class="modal-overlay" id="modalOverlay">
       <div class="modal">
         <div class="modal-header">
           <h2 class="modal-title">Configurar Chat</h2>
-          <p class="modal-description">Selecciona la categoría que mejor describe tu consulta</p>
+          <p class="modal-description">Selecciona una sesión o crea una nueva</p>
         </div>
 
         <form id="categoryForm">
           <div class="form-group">
-            <label class="form-label" for="category">Categoría de Consulta</label>
+            <label class="form-label" for="comboboxSearch">Sesión de Consulta</label>
             
             <div class="combobox-container">
               <button type="button" class="combobox-trigger" id="comboboxTrigger">
@@ -33,7 +36,7 @@ export function renderModal() {
                   type="text" 
                   class="combobox-search" 
                   id="comboboxSearch" 
-                  placeholder="Buscar categoría..."
+                  placeholder="Buscar sesión..."
                 />
                 <ul class="combobox-list" id="comboboxList"></ul>
                 <div class="combobox-empty" id="comboboxEmpty" style="display: none;">
@@ -43,9 +46,24 @@ export function renderModal() {
             </div>
           </div>
 
+          <div class="form-divider">
+            <span>O</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newCategoryInput">Crear Nueva Sesión</label>
+            <input 
+              type="text" 
+              class="form-input" 
+              id="newCategoryInput" 
+              placeholder="Ej: Consultoría, Producto, etc."
+              maxlength="50"
+            />
+          </div>
+
           <div class="modal-actions">
             <button type="button" class="btn btn-secondary" id="cancelBtn">Cancelar</button>
-            <button type="submit" class="btn btn-submit" id="submitBtn" disabled>Continuar</button>
+            <button type="submit" class="btn btn-submit" id="submitBtn">Continuar</button>
           </div>
         </form>
       </div>
@@ -63,6 +81,8 @@ function attachModalEventListeners() {
   const categoryForm = document.getElementById('categoryForm');
   const comboboxTrigger = document.getElementById('comboboxTrigger');
   const comboboxSearch = document.getElementById('comboboxSearch');
+  const newCategoryInput = document.getElementById('newCategoryInput');
+  const submitBtn = document.getElementById('submitBtn');
 
   // Cancel button
   cancelBtn.addEventListener('click', () => {
@@ -84,6 +104,16 @@ function attachModalEventListeners() {
     renderCategories(e.target.value);
   });
 
+  // New category input - clear selection when typing
+  newCategoryInput.addEventListener('input', (e) => {
+    if (e.target.value.trim()) {
+      clearCategorySelection();
+      updateSubmitButton();
+    } else {
+      updateSubmitButton();
+    }
+  });
+
   // Close combobox when clicking outside
   document.addEventListener('click', (e) => {
     if (!comboboxTrigger.contains(e.target) && 
@@ -103,7 +133,7 @@ function renderCategories(filter = '') {
   const comboboxList = document.getElementById('comboboxList');
   const comboboxEmpty = document.getElementById('comboboxEmpty');
 
-  const filteredCategories = CATEGORIES.filter(cat => 
+  const filteredCategories = currentCategories.filter(cat => 
     cat.label.toLowerCase().includes(filter.toLowerCase())
   );
 
@@ -142,13 +172,37 @@ function selectCategory(category) {
   
   const comboboxTrigger = document.getElementById('comboboxTrigger');
   const triggerSpan = comboboxTrigger.querySelector('span');
-  const submitBtn = document.getElementById('submitBtn');
+  const newCategoryInput = document.getElementById('newCategoryInput');
   
   triggerSpan.textContent = category.label;
   comboboxTrigger.classList.add('has-value');
-  submitBtn.disabled = false;
   
+  // Clear new category input when selecting from list
+  newCategoryInput.value = '';
+  
+  updateSubmitButton();
   closeCombobox();
+}
+
+function clearCategorySelection() {
+  setState({ selectedCategory: null });
+  
+  const comboboxTrigger = document.getElementById('comboboxTrigger');
+  const triggerSpan = comboboxTrigger.querySelector('span');
+  
+  triggerSpan.textContent = 'Seleccionar categoría...';
+  comboboxTrigger.classList.remove('has-value');
+  
+  renderCategories();
+}
+
+function updateSubmitButton() {
+  const submitBtn = document.getElementById('submitBtn');
+  const newCategoryInput = document.getElementById('newCategoryInput');
+  const hasSelection = state.selectedCategory !== null;
+  const hasNewCategory = newCategoryInput.value.trim().length > 0;
+  
+  submitBtn.disabled = !(hasSelection || hasNewCategory);
 }
 
 function toggleCombobox() {
@@ -178,21 +232,58 @@ function closeCombobox() {
 }
 
 function handleSubmit() {
-  if (state.selectedCategory) {
+  const newCategoryInput = document.getElementById('newCategoryInput');
+  const newCategoryValue = newCategoryInput.value.trim();
+  
+  let categoryToUse = state.selectedCategory;
+  
+  // If user entered a new category, create it
+  if (newCategoryValue) {
+    const result = addCategory(newCategoryValue);
+    
+    if (result.success) {
+      categoryToUse = result.category.value;
+      setState({ selectedCategory: categoryToUse });
+      
+      // Update the categories list
+      currentCategories = getCategories();
+      renderCategories();
+      
+      console.log('New category created:', result.category);
+    } else {
+      alert(result.message || 'Error al crear la categoría');
+      return;
+    }
+  }
+  
+  if (categoryToUse) {
     closeModal();
     // Dispatch custom event for chat initialization
     window.dispatchEvent(new CustomEvent('categorySelected', {
-      detail: { category: state.selectedCategory }
+      detail: { category: categoryToUse }
     }));
   }
 }
 
 export function openModal() {
+  // Refresh categories from localStorage
+  currentCategories = getCategories();
+  renderCategories();
+  
   const modalOverlay = document.getElementById('modalOverlay');
   modalOverlay.classList.add('active');
 }
 
 export function closeModal() {
   const modalOverlay = document.getElementById('modalOverlay');
+  const newCategoryInput = document.getElementById('newCategoryInput');
+  
   modalOverlay.classList.remove('active');
+  
+  // Reset form
+  clearCategorySelection();
+  if (newCategoryInput) {
+    newCategoryInput.value = '';
+  }
+  updateSubmitButton();
 }
