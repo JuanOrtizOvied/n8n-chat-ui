@@ -2,7 +2,7 @@
    CHAT INITIALIZATION
    ============================================ */
 
-import { CHAT_CONFIG } from './config.js';
+import { CHAT_CONFIG, initializeSalesSession } from './config.js';
 import { state, setState } from './state.js';
 import { hideHeader } from './components/header.js';
 import { hideInfoCard } from './components/infoCard.js';
@@ -15,8 +15,11 @@ window.myChatCallbacks = {
 
   beforeSubmit: function (data) {
     console.log("Before submit:", data);
+    
+    // Add custom metadata
     data.metadata.customField = "Modified by beforeSubmit";
     data.metadata.selectedCategory = state.selectedCategory;
+    
     return data;
   },
 
@@ -60,6 +63,34 @@ export async function initializeChat(category) {
     
     setState({ chatInitialized: true });
     
+    // Check if category has existing session data in localStorage
+    const sessionKey = `${category}-session_CHAT`;
+    const existingSession = localStorage.getItem(sessionKey);
+    
+    if (!existingSession) {
+      // No data exists - send automatic first message
+      console.log(`No existing session found for ${category}, sending automatic message`);
+      
+      Chatbot.sendMessage("Hola! empecemos a crear mi filosofia de inversión.", {
+        metadata: {
+          n8nchatui: {
+            sessionKey: `${category}-session`,
+          },
+          category: category,
+          pageType: "help",
+          user_uuid: state.userUuid,
+        },
+      });
+    } else {
+      console.log(`Existing session found for ${category}, skipping automatic message`);
+    }
+    
+    // If sales category, initialize chat history in localStorage
+    if (category === 'martin') {
+      initializeSalesSession();
+      console.log('Sales session checked/initialized');
+    }
+    
     // Hide header and info card
     setTimeout(() => {
       hideHeader();
@@ -72,7 +103,7 @@ export async function initializeChat(category) {
       chatContainer.classList.add('active');
     }, 400);
     
-    console.log('Chat initialized successfully');
+    console.log('Chat initialized successfully for category:', category);
   } catch (error) {
     console.error("Failed to initialize chat:", error);
   }

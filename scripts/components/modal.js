@@ -25,7 +25,7 @@ export function renderModal() {
             
             <div class="combobox-container">
               <button type="button" class="combobox-trigger" id="comboboxTrigger">
-                <span>Seleccionar categoría...</span>
+                <span>Seleccionar sesión...</span>
                 <svg class="combobox-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -40,7 +40,7 @@ export function renderModal() {
                 />
                 <ul class="combobox-list" id="comboboxList"></ul>
                 <div class="combobox-empty" id="comboboxEmpty" style="display: none;">
-                  No se encontró la categoría.
+                  No se encontró la sesión.
                 </div>
               </div>
             </div>
@@ -56,7 +56,7 @@ export function renderModal() {
               type="text" 
               class="form-input" 
               id="newCategoryInput" 
-              placeholder="Ej: Consultoría, Producto, etc."
+              placeholder="Ej: martin prueba, ale 2..."
               maxlength="50"
             />
           </div>

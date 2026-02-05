@@ -1,241 +1,300 @@
 # Sabbi Chat - Vanilla JavaScript Application
 
-A scalable, modular chatbot application with **persistent session management** built with vanilla JavaScript.
+A scalable, modular chatbot application with **persistent session management** and **sales chat history** built with vanilla JavaScript.
 
-## 🚀 New Features
+## 🚀 Features
 
-### ✨ Session Persistence
-- **Auto-Resume Chat**: When you refresh the page, the chat automatically resumes with your last selected category
-- **No Re-selection Needed**: Skip the modal and go straight to chatting
-- **Seamless Experience**: Your conversation context is maintained
+### ✨ Sales Chat History
+- **Pre-loaded Conversation**: Sales category comes with previous chat messages
+- **Automatic Initialization**: First time sales is loaded, chat history is saved to localStorage
+- **Persistent History**: Chat history remains in localStorage across sessions
+- **Key**: `sales-session_CHAT`
 
-### 🎯 How It Works
+### 🎯 Session Persistence
+- **Auto-Resume Chat**: Refresh the page and continue where you left off
+- **Category Memory**: Last selected category is remembered
+- **Sales History**: Sales chat loads with previous conversation
 
-**First Time User:**
-1. Click "Iniciar Chat" → Modal opens
-2. Select or create a category
-3. Click "Continuar" → Category is saved to localStorage
-4. Chat initializes
+## 📊 How Sales Chat History Works
 
-**Returning User:**
-5. **Refresh the page** → Chat automatically loads with saved category!
-6. **No modal, no selection needed** → Straight to chat
+### First Time Sales is Selected:
 
-**Change Category:**
-- Simply click "Iniciar Chat" again to select a different category
-- Your new selection will be saved automatically
+1. **User selects "Sales" category**
+2. **Chat initializes**
+3. **Check localStorage** for `sales-session_CHAT`
+4. **Not found** → Initialize with pre-defined chat history
+5. **localStorage created** with 4 messages:
+   ```javascript
+   [
+     { message: "...", type: "apiMessage" },      // Initial prompt
+     { message: "hola 5 de feb 12:55", type: "userMessage", ... },
+     { message: "Hola Martín...", type: "apiMessage", ... },
+     { message: "hola 5 de feb 12:55 (localstorage)", type: "userMessage", ... }
+   ]
+   ```
 
-## 📁 Project Structure
+### Subsequent Times:
 
-```
-chatbot-project/
-├── index.html                 # Main HTML entry point
-├── styles/
-│   ├── base.css              # Base styles
-│   ├── components.css        # Component styles
-│   ├── modal.css             # Modal styles
-│   └── animations.css        # Animations
-├── scripts/
-│   ├── config.js             # Configuration + localStorage
-│   ├── state.js              # State management
-│   ├── chat.js               # Chat initialization
-│   ├── main.js               # App entry + session check
-│   └── components/
-│       ├── header.js         # Header component
-│       ├── infoCard.js       # Info card component
-│       └── modal.js          # Modal with category management
-└── README.md                 # This file
-```
+6. **User selects "Sales"**
+7. **Check localStorage** → Found!
+8. **History already exists** → No re-initialization
+9. **Chat continues** with existing history
 
-## 🎯 Key Features
+### Other Categories:
 
-### 1. **Persistent Category Storage**
-```javascript
-// Categories stored in localStorage
-localStorage: 'sabbi_chat_categories'
+- **No history initialization**
+- **Fresh chat every time**
+- **No localStorage updates** (except selected category)
 
-// Selected category stored separately
-localStorage: 'sabbi_chat_selected_category'
-```
+## 📁 Chat History Structure
 
-### 2. **Auto-Resume on Page Load**
-- Checks localStorage for saved category on app init
-- If found, automatically initializes chat
-- Skips header/info card and goes straight to chat
-
-### 3. **Create Custom Categories**
-- Type new category name in input field
-- Automatically saved to localStorage
-- Available immediately in dropdown
-
-### 4. **Smart Form Validation**
-- Submit enabled when category selected OR new category typed
-- Mutual exclusivity between selection and input
-- Duplicate prevention
-
-## 🔧 LocalStorage Functions
-
-### config.js API
+The `sales-session_CHAT` localStorage key contains an array of message objects:
 
 ```javascript
-// Category Management
-getCategories()              // Load all categories
-saveCategories(categories)   // Save categories array
-addCategory(label)          // Add new category
+[
+  {
+    "message": "Viendo que has construido un portafolio...",
+    "type": "apiMessage"
+  },
+  {
+    "message": "hola 5 de feb 12:55",
+    "type": "userMessage",
+    "fileUploads": [],
+    "dateTime": "2026-02-05T05:55:23.682Z"
+  },
+  {
+    "followUpPrompts": [],
+    "message": "Hola Martín, te leo...",
+    "type": "apiMessage",
+    "dateTime": "2026-02-05T05:55:31.902Z",
+    "attachments": []
+  },
+  {
+    "message": "hola 5 de feb 12:55 (localstorage)",
+    "type": "userMessage",
+    "fileUploads": [],
+    "dateTime": "2026-02-05T05:58:23.682Z"
+  }
+]
+```
 
-// Session Persistence
-saveSelectedCategory(category)  // Save last selected category
-getSelectedCategory()           // Get last selected category
-clearSelectedCategory()         // Clear saved category
+## 🔧 Sales Session API
 
-// Initialization
-initializeCategories()       // Set up default categories
+### config.js Functions
+
+```javascript
+// Get sales chat history
+getSalesSession()
+// Returns: Array of message objects or null
+
+// Initialize sales session (first time only)
+initializeSalesSession()
+// Returns: boolean (true if initialized, false if already exists)
+
+// Save/update sales chat history
+saveSalesSession(chatHistory)
+// Returns: boolean (success/failure)
+
+// Clear sales chat history
+clearSalesSession()
+// Returns: boolean
 ```
 
 ## 📖 Usage Examples
 
-### Check for Saved Session
-```javascript
-import { getSelectedCategory } from './config.js';
+### Check if Sales History Exists
 
-const savedCategory = getSelectedCategory();
-if (savedCategory) {
-  // User has a previous session
-  initializeChat(savedCategory);
+```javascript
+import { getSalesSession } from './scripts/config.js';
+
+const history = getSalesSession();
+if (history) {
+  console.log('Sales history exists with', history.length, 'messages');
+} else {
+  console.log('No sales history yet');
 }
 ```
 
-### Save Category on Submit
-```javascript
-import { saveSelectedCategory } from './config.js';
+### View Sales History
 
-function handleSubmit(category) {
-  saveSelectedCategory(category);
-  // Chat will auto-resume on next visit
+```javascript
+import { getSalesSession } from './scripts/config.js';
+
+const history = getSalesSession();
+if (history) {
+  history.forEach((msg, index) => {
+    console.log(`Message ${index + 1}:`, msg.message);
+    console.log(`Type:`, msg.type);
+  });
 }
 ```
 
-### Clear Session
+### Clear Sales History
+
 ```javascript
-import { clearSelectedCategory } from './config.js';
+import { clearSalesSession } from './scripts/config.js';
 
-function logout() {
-  clearSelectedCategory();
-  // User will see modal on next visit
-}
+clearSalesSession();
+console.log('Sales history cleared - will be re-initialized next time');
 ```
 
-## 🎬 User Flow
+## 🧪 Testing Sales Chat History
 
-### First Visit:
+### Test Initial Load:
+
+1. **Clear localStorage** (DevTools → Application → Clear All)
+2. Open the app
+3. Select "Sales" category
+4. **Check localStorage** → Find `sales-session_CHAT`
+5. ✅ See 4 pre-loaded messages in JSON format!
+
+### Test Persistence:
+
+1. Sales history is loaded
+2. **Refresh page** (F5)
+3. Select "Sales" again
+4. **Check localStorage** → Still there!
+5. ✅ History persists across sessions!
+
+### Test Re-initialization:
+
+1. **Delete** `sales-session_CHAT` from localStorage
+2. Select "Sales" category
+3. **Check console** → "Sales session initialized with chat history"
+4. **Check localStorage** → History re-created!
+5. ✅ Automatic re-initialization works!
+
+### Test Other Categories:
+
+1. Select "Support" category
+2. **Check localStorage**
+3. ✅ No `sales-session_CHAT` created!
+4. ✅ Only `sabbi_chat_selected_category` updated!
+
+## 🔐 LocalStorage Keys
+
 ```
-1. Page loads → Header + Info Card visible
-2. Click "Iniciar Chat" → Modal opens
-3. Select/Create category → Click "Continuar"
-4. Category saved to localStorage
-5. Chat initializes (header/info hidden)
-```
-
-### Subsequent Visits:
-```
-1. Page loads → Checks localStorage
-2. Saved category found → Auto-initialize chat
-3. Header/Info hidden immediately
-4. Chat ready to use!
-```
-
-### Change Category:
-```
-1. Click "Iniciar Chat" (button still available)
-2. Select different category
-3. New category saved, replaces old one
-4. Chat reinitializes
-```
-
-## 🧪 Testing Session Persistence
-
-1. Open the app (first time)
-2. Select a category (e.g., "Support")
-3. Chat loads
-4. **Refresh the page (F5)**
-5. ✅ Chat loads automatically with "Support" category!
-6. **Check DevTools:**
-   - Application → Local Storage
-   - Key: `sabbi_chat_selected_category`
-   - Value: `support`
-
-## 🔐 Security & Privacy
-
-- All data stored client-side in localStorage
-- No server-side tracking
-- Clear browser data to reset
-- No cookies, no external tracking
-
-## 📊 LocalStorage Structure
-
-```json
-// Categories List
-"sabbi_chat_categories": [
-  { "value": "support", "label": "Support" },
-  { "value": "sales", "label": "Sales" },
-  { "value": "custom-category", "label": "Custom Category" }
-]
-
-// Selected Category (for session persistence)
-"sabbi_chat_selected_category": "support"
+sabbi_chat_categories              → List of all categories
+sabbi_chat_selected_category       → Current/last selected category
+sales-session_CHAT                 → Sales chat history (array of messages)
 ```
 
 ## 🎯 Modified Files
 
 ### config.js
-- Added `saveSelectedCategory()`
-- Added `getSelectedCategory()`
-- Added `clearSelectedCategory()`
-- New storage key: `SELECTED_CATEGORY_KEY`
-
-### modal.js
-- Calls `saveSelectedCategory()` on form submit
-- Saves category before dispatching `categorySelected` event
-
-### main.js
-- Added `checkSavedCategory()` function
-- Auto-initializes chat if saved category exists
-- Runs on app initialization
+- **Added**: `SALES_CHAT_HISTORY` constant with 4 pre-defined messages
+- **Added**: `initializeSalesSession()` - creates history first time only
+- **Updated**: `getSalesSession()` - returns array of messages
+- **Updated**: `saveSalesSession()` - saves array of messages
 
 ### chat.js
-- No changes (works with saved category seamlessly)
+- **Updated**: Calls `initializeSalesSession()` when sales category loads
+- **Removed**: Session metadata saving
+- **Added**: Chat history initialization check
 
-## 🚧 Future Enhancements
+## 🎬 User Flow
 
-- [ ] Clear session button in chat UI
-- [ ] Category usage analytics
-- [ ] Session timeout (auto-clear after X days)
-- [ ] Multiple session support
-- [ ] Session export/import
-- [ ] Category favorites
+### First Sales Visit:
+```
+1. User selects "Sales"
+2. Chat initializes
+3. initializeSalesSession() called
+4. localStorage checked → Not found
+5. localStorage['sales-session_CHAT'] = [4 messages]
+6. Console: "Sales session initialized with chat history"
+7. Chat ready with previous messages
+```
+
+### Subsequent Sales Visits:
+```
+1. User selects "Sales"
+2. Chat initializes
+3. initializeSalesSession() called
+4. localStorage checked → Found!
+5. Console: "Sales session already exists"
+6. Chat ready with existing history
+```
+
+### Other Categories:
+```
+1. User selects "Support" (or any other)
+2. Chat initializes
+3. No history initialization
+4. Fresh chat
+```
 
 ## 💡 Pro Tips
 
-**Reset Session:**
-- Open DevTools → Application → Local Storage
-- Delete `sabbi_chat_selected_category` key
-- Refresh page → Modal will appear
+### View Sales History in Console:
 
-**Clear All Data:**
 ```javascript
+import { getSalesSession } from './scripts/config.js';
+const history = getSalesSession();
+console.table(history);
+```
+
+### Check Message Count:
+
+```javascript
+const history = getSalesSession();
+console.log('Total messages:', history ? history.length : 0);
+```
+
+### Export Sales History:
+
+```javascript
+const history = getSalesSession();
+console.log(JSON.stringify(history, null, 2));
+// Copy and paste to save externally
+```
+
+### Reset Sales History:
+
+```javascript
+// Method 1: Clear and let it re-initialize
+import { clearSalesSession } from './scripts/config.js';
+clearSalesSession();
+// Next sales load will re-create default history
+
+// Method 2: Clear all localStorage
 localStorage.clear();
 ```
 
-**Manage Categories Programmatically:**
+## 🔍 Debugging
+
+### Check if history exists:
 ```javascript
-import { getCategories, saveCategories, getSelectedCategory } from './scripts/config.js';
-
-// View all categories
-console.log(getCategories());
-
-// View current session
-console.log(getSelectedCategory());
+console.log(localStorage.getItem('sales-session_CHAT'));
 ```
+
+### Check initialization status:
+```javascript
+import { getSalesSession } from './scripts/config.js';
+console.log('History exists:', getSalesSession() !== null);
+```
+
+### Monitor in console:
+Watch for these messages:
+- "Sales session initialized with chat history" (first time)
+- "Sales session already exists" (subsequent times)
+
+## ⚠️ Important Notes
+
+### What IS Saved:
+- ✅ Sales chat history (4 pre-defined messages)
+- ✅ Selected category
+- ✅ Category list
+
+### What is NOT Saved:
+- ❌ New messages sent by user (not automatically added)
+- ❌ New responses from bot (not automatically added)
+- ❌ History for other categories
+
+### Sales History Behavior:
+- 🔄 Initialized once (first time sales loads)
+- 🔒 Persists across page refreshes
+- ❌ NOT automatically updated with new messages
+- 🔄 Can be manually cleared and re-initialized
 
 ## 📄 License
 
@@ -243,4 +302,4 @@ Proprietary - Sabbi Chat Application
 
 ---
 
-**Built with ❤️ using Vanilla JavaScript + LocalStorage Session Management**
+**Built with ❤️ using Vanilla JavaScript + Sales Chat History**
