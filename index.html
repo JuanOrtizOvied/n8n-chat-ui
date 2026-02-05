@@ -1,13 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>n8n-chat-ui</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Sabbi Chat - Vanilla JS</title>
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+  <link rel="stylesheet" href="styles/modal.css" />
+  <link rel="stylesheet" href="styles/animations.css" />
+</head>
+<body>
+  <!-- Background Decoration -->
+  <div class="bg-decoration">
+    <div class="bg-blob-1"></div>
+    <div class="bg-blob-2"></div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Header Component -->
+    <div id="headerComponent"></div>
+
+    <!-- Info Card Component -->
+    <div id="infoCardComponent"></div>
+
+    <!-- Chat Container -->
+    <div class="chat-container" id="chatContainer">
+      <n8nchatui-inpage></n8nchatui-inpage>
+    </div>
+  </div>
+
+  <!-- Modal Component -->
+  <div id="modalComponent"></div>
+
+  <!-- Scripts -->
+  <script type="module" src="scripts/config.js"></script>
+  <script type="module" src="scripts/state.js"></script>
+  <script type="module" src="scripts/components/header.js"></script>
+  <script type="module" src="scripts/components/infoCard.js"></script>
+  <script type="module" src="scripts/components/modal.js"></script>
+  <script type="module" src="scripts/chat.js"></script>
+  <script type="module" src="scripts/main.js"></script>
+</body>
 </html>
