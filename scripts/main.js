@@ -2,7 +2,7 @@
    MAIN APPLICATION
    ============================================ */
 
-import { initializeCategories } from './config.js';
+import { initializeCategories, getSelectedCategory } from './config.js';
 import { renderHeader } from './components/header.js';
 import { renderInfoCard } from './components/infoCard.js';
 import { renderModal, openModal } from './components/modal.js';
@@ -20,6 +20,9 @@ function init() {
 
   // Attach event listeners
   attachEventListeners();
+  
+  // Check if user has a saved category from previous session
+  checkSavedCategory();
 }
 
 function attachEventListeners() {
@@ -35,6 +38,19 @@ function attachEventListeners() {
     const { category } = e.detail;
     initializeChat(category);
   });
+}
+
+// Check for saved category and auto-initialize chat
+function checkSavedCategory() {
+  const savedCategory = getSelectedCategory();
+  
+  if (savedCategory) {
+    console.log('Found saved category:', savedCategory);
+    // Auto-initialize chat with saved category
+    setTimeout(() => {
+      initializeChat(savedCategory);
+    }, 100);
+  }
 }
 
 // Start application when DOM is ready

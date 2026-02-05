@@ -2,7 +2,7 @@
    MODAL COMPONENT
    ============================================ */
 
-import { getCategories, addCategory } from '../config.js';
+import { getCategories, addCategory, saveSelectedCategory } from '../config.js';
 import { state, setState } from '../state.js';
 
 let comboboxOpen = false;
@@ -257,6 +257,9 @@ function handleSubmit() {
   }
   
   if (categoryToUse) {
+    // Save selected category to localStorage
+    saveSelectedCategory(categoryToUse);
+    
     closeModal();
     // Dispatch custom event for chat initialization
     window.dispatchEvent(new CustomEvent('categorySelected', {

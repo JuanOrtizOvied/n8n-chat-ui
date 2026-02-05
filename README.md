@@ -1,27 +1,29 @@
 # Sabbi Chat - Vanilla JavaScript Application
 
-A scalable, modular chatbot application built with vanilla JavaScript, structured using modern best practices.
+A scalable, modular chatbot application with **persistent session management** built with vanilla JavaScript.
 
 ## 🚀 New Features
 
-### ✨ LocalStorage Category Management
-- **Persistent Categories**: All categories are saved to localStorage
-- **Create Custom Categories**: Users can add their own categories on the fly
-- **Smart Validation**: Prevents duplicate categories and validates input
-- **Seamless Experience**: Categories persist across browser sessions
+### ✨ Session Persistence
+- **Auto-Resume Chat**: When you refresh the page, the chat automatically resumes with your last selected category
+- **No Re-selection Needed**: Skip the modal and go straight to chatting
+- **Seamless Experience**: Your conversation context is maintained
 
 ### 🎯 How It Works
 
-**Option 1: Select Existing Category**
-- Click "Iniciar Chat"
-- Choose from the dropdown list
-- Click "Continuar"
+**First Time User:**
+1. Click "Iniciar Chat" → Modal opens
+2. Select or create a category
+3. Click "Continuar" → Category is saved to localStorage
+4. Chat initializes
 
-**Option 2: Create New Category**
-- Click "Iniciar Chat"  
-- Type a new category name in "Crear Nueva Categoría"
-- Click "Continuar"
-- Your new category is saved to localStorage automatically!
+**Returning User:**
+5. **Refresh the page** → Chat automatically loads with saved category!
+6. **No modal, no selection needed** → Straight to chat
+
+**Change Category:**
+- Simply click "Iniciar Chat" again to select a different category
+- Your new selection will be saved automatically
 
 ## 📁 Project Structure
 
@@ -30,168 +32,215 @@ chatbot-project/
 ├── index.html                 # Main HTML entry point
 ├── styles/
 │   ├── base.css              # Base styles
-│   ├── components.css        # Component styles (includes new input styles)
+│   ├── components.css        # Component styles
 │   ├── modal.css             # Modal styles
 │   └── animations.css        # Animations
 ├── scripts/
-│   ├── config.js             # Configuration + localStorage functions
+│   ├── config.js             # Configuration + localStorage
 │   ├── state.js              # State management
 │   ├── chat.js               # Chat initialization
-│   ├── main.js               # App entry point
+│   ├── main.js               # App entry + session check
 │   └── components/
 │       ├── header.js         # Header component
 │       ├── infoCard.js       # Info card component
-│       └── modal.js          # Modal with create category feature
+│       └── modal.js          # Modal with category management
 └── README.md                 # This file
 ```
 
-## 🎯 Key Functions
+## 🎯 Key Features
 
-### Config.js - Category Management
+### 1. **Persistent Category Storage**
+```javascript
+// Categories stored in localStorage
+localStorage: 'sabbi_chat_categories'
+
+// Selected category stored separately
+localStorage: 'sabbi_chat_selected_category'
+```
+
+### 2. **Auto-Resume on Page Load**
+- Checks localStorage for saved category on app init
+- If found, automatically initializes chat
+- Skips header/info card and goes straight to chat
+
+### 3. **Create Custom Categories**
+- Type new category name in input field
+- Automatically saved to localStorage
+- Available immediately in dropdown
+
+### 4. **Smart Form Validation**
+- Submit enabled when category selected OR new category typed
+- Mutual exclusivity between selection and input
+- Duplicate prevention
+
+## 🔧 LocalStorage Functions
+
+### config.js API
 
 ```javascript
-// Load categories from localStorage
-getCategories() 
-// Returns: Array of category objects
+// Category Management
+getCategories()              // Load all categories
+saveCategories(categories)   // Save categories array
+addCategory(label)          // Add new category
 
-// Save categories to localStorage
-saveCategories(categories)
-// Returns: boolean (success/failure)
+// Session Persistence
+saveSelectedCategory(category)  // Save last selected category
+getSelectedCategory()           // Get last selected category
+clearSelectedCategory()         // Clear saved category
 
-// Add a new category
-addCategory(label)
-// Returns: { success: true, category: {...} } or { success: false, message: '...' }
-
-// Initialize default categories on first load
-initializeCategories()
+// Initialization
+initializeCategories()       // Set up default categories
 ```
 
-### Modal.js - Smart Form Logic
+## 📖 Usage Examples
 
-- **Dynamic Validation**: Button enabled when category selected OR new category entered
-- **Mutual Exclusivity**: Selecting from list clears input, typing clears selection
-- **Auto-refresh**: Categories reload from localStorage when modal opens
-
-## 📦 Zero Dependencies
-
-**No npm, no build tools!** Just:
-- Google Fonts (Manrope)
-- n8n Chat Widget
-
-## 🧪 Testing
-
-1. Open `index.html` in your browser
-2. Create a new category (e.g., "VIP Support")
-3. Refresh the page
-4. Open modal - your category is still there! ✅
-
-**Check LocalStorage:**
-- DevTools → Application → Local Storage
-- Key: `sabbi_chat_categories`
-- Value: JSON array of categories
-
-## 🎨 What Changed
-
-### Files Modified:
-
-1. **config.js** 
-   - Removed hardcoded `CATEGORIES` constant
-   - Added localStorage functions
-   - Added category validation
-
-2. **components.css**
-   - Added `.form-input` styles
-   - Added `.form-divider` styles for "O" separator
-
-3. **modal.js**
-   - Added "Create New Category" input field
-   - Added smart form validation
-   - Added localStorage integration
-   - Added duplicate prevention
-
-4. **main.js**
-   - Added `initializeCategories()` call on app start
-
-## 🔐 Security & Validation
-
-- Category names limited to 50 characters
-- Automatic slug generation (lowercase, hyphenated)
-- Duplicate detection
-- Input sanitization via `trim()`
-- Try-catch error handling for localStorage operations
-
-## 📈 Performance
-
-- LocalStorage operations are synchronous but fast
-- Categories cached in component state
-- Minimal re-renders
-- No network calls for category management
-
-## 🚧 Future Enhancements
-
-- [ ] Edit existing categories
-- [ ] Delete categories
-- [ ] Reorder categories (drag & drop)
-- [ ] Export/Import categories as JSON
-- [ ] Category icons/colors
-- [ ] Search/filter categories
-- [ ] Category usage statistics
-
-## 📄 LocalStorage Structure
-
-```json
-[
-  {
-    "value": "support",
-    "label": "Support"
-  },
-  {
-    "value": "custom-category",
-    "label": "Custom Category"
-  }
-]
-```
-
-**Storage Key:** `sabbi_chat_categories`
-
-## 🎯 User Flow
-
-```
-1. User clicks "Iniciar Chat"
-2. Modal opens with:
-   - Dropdown of existing categories (from localStorage)
-   - Input field to create new category
-3. User either:
-   - Selects existing category, OR
-   - Types new category name
-4. Clicks "Continuar"
-5. If new category:
-   - Validates (no duplicates, not empty)
-   - Saves to localStorage
-   - Adds to dropdown list
-6. Chat initializes with selected/created category
-```
-
-## 📖 API Reference
-
-### getCategories()
+### Check for Saved Session
 ```javascript
-import { getCategories } from './config.js';
-const categories = getCategories();
-// Returns: [{ value: 'support', label: 'Support' }, ...]
-```
+import { getSelectedCategory } from './config.js';
 
-### addCategory(label)
-```javascript
-import { addCategory } from './config.js';
-const result = addCategory('New Category');
-if (result.success) {
-  console.log('Created:', result.category);
-} else {
-  console.error('Error:', result.message);
+const savedCategory = getSelectedCategory();
+if (savedCategory) {
+  // User has a previous session
+  initializeChat(savedCategory);
 }
 ```
 
+### Save Category on Submit
+```javascript
+import { saveSelectedCategory } from './config.js';
+
+function handleSubmit(category) {
+  saveSelectedCategory(category);
+  // Chat will auto-resume on next visit
+}
+```
+
+### Clear Session
+```javascript
+import { clearSelectedCategory } from './config.js';
+
+function logout() {
+  clearSelectedCategory();
+  // User will see modal on next visit
+}
+```
+
+## 🎬 User Flow
+
+### First Visit:
+```
+1. Page loads → Header + Info Card visible
+2. Click "Iniciar Chat" → Modal opens
+3. Select/Create category → Click "Continuar"
+4. Category saved to localStorage
+5. Chat initializes (header/info hidden)
+```
+
+### Subsequent Visits:
+```
+1. Page loads → Checks localStorage
+2. Saved category found → Auto-initialize chat
+3. Header/Info hidden immediately
+4. Chat ready to use!
+```
+
+### Change Category:
+```
+1. Click "Iniciar Chat" (button still available)
+2. Select different category
+3. New category saved, replaces old one
+4. Chat reinitializes
+```
+
+## 🧪 Testing Session Persistence
+
+1. Open the app (first time)
+2. Select a category (e.g., "Support")
+3. Chat loads
+4. **Refresh the page (F5)**
+5. ✅ Chat loads automatically with "Support" category!
+6. **Check DevTools:**
+   - Application → Local Storage
+   - Key: `sabbi_chat_selected_category`
+   - Value: `support`
+
+## 🔐 Security & Privacy
+
+- All data stored client-side in localStorage
+- No server-side tracking
+- Clear browser data to reset
+- No cookies, no external tracking
+
+## 📊 LocalStorage Structure
+
+```json
+// Categories List
+"sabbi_chat_categories": [
+  { "value": "support", "label": "Support" },
+  { "value": "sales", "label": "Sales" },
+  { "value": "custom-category", "label": "Custom Category" }
+]
+
+// Selected Category (for session persistence)
+"sabbi_chat_selected_category": "support"
+```
+
+## 🎯 Modified Files
+
+### config.js
+- Added `saveSelectedCategory()`
+- Added `getSelectedCategory()`
+- Added `clearSelectedCategory()`
+- New storage key: `SELECTED_CATEGORY_KEY`
+
+### modal.js
+- Calls `saveSelectedCategory()` on form submit
+- Saves category before dispatching `categorySelected` event
+
+### main.js
+- Added `checkSavedCategory()` function
+- Auto-initializes chat if saved category exists
+- Runs on app initialization
+
+### chat.js
+- No changes (works with saved category seamlessly)
+
+## 🚧 Future Enhancements
+
+- [ ] Clear session button in chat UI
+- [ ] Category usage analytics
+- [ ] Session timeout (auto-clear after X days)
+- [ ] Multiple session support
+- [ ] Session export/import
+- [ ] Category favorites
+
+## 💡 Pro Tips
+
+**Reset Session:**
+- Open DevTools → Application → Local Storage
+- Delete `sabbi_chat_selected_category` key
+- Refresh page → Modal will appear
+
+**Clear All Data:**
+```javascript
+localStorage.clear();
+```
+
+**Manage Categories Programmatically:**
+```javascript
+import { getCategories, saveCategories, getSelectedCategory } from './scripts/config.js';
+
+// View all categories
+console.log(getCategories());
+
+// View current session
+console.log(getSelectedCategory());
+```
+
+## 📄 License
+
+Proprietary - Sabbi Chat Application
+
 ---
 
-**Built with ❤️ using Vanilla JavaScript + LocalStorage**
+**Built with ❤️ using Vanilla JavaScript + LocalStorage Session Management**

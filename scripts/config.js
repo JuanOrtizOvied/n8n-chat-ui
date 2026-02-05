@@ -63,11 +63,15 @@ export const CHAT_CONFIG = {
 
 // Default categories
 const DEFAULT_CATEGORIES = [
-  { value: "martin", label: "Martín" },
-  { value: "ale_bre", label: "Alessandro" },
+  { value: "support", label: "Support" },
+  { value: "sales", label: "Sales" },
+  { value: "technical", label: "Technical" },
+  { value: "billing", label: "Billing" },
+  { value: "general", label: "General Inquiry" },
 ];
 
 const STORAGE_KEY = 'sabbi_chat_categories';
+const SELECTED_CATEGORY_KEY = 'sabbi_chat_selected_category';
 
 // Load categories from localStorage or use defaults
 export function getCategories() {
@@ -111,6 +115,38 @@ export function addCategory(label) {
   }
   
   return { success: false, message: 'Failed to save category' };
+}
+
+// Save selected category to localStorage
+export function saveSelectedCategory(category) {
+  try {
+    localStorage.setItem(SELECTED_CATEGORY_KEY, category);
+    return true;
+  } catch (error) {
+    console.error('Error saving selected category:', error);
+    return false;
+  }
+}
+
+// Get last selected category from localStorage
+export function getSelectedCategory() {
+  try {
+    return localStorage.getItem(SELECTED_CATEGORY_KEY);
+  } catch (error) {
+    console.error('Error loading selected category:', error);
+    return null;
+  }
+}
+
+// Clear selected category from localStorage
+export function clearSelectedCategory() {
+  try {
+    localStorage.removeItem(SELECTED_CATEGORY_KEY);
+    return true;
+  } catch (error) {
+    console.error('Error clearing selected category:', error);
+    return false;
+  }
 }
 
 // Initialize categories in localStorage if not present
