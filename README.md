@@ -8,7 +8,7 @@ A scalable, modular chatbot application with **persistent session management** a
 - **Pre-loaded Conversation**: Sales category comes with previous chat messages
 - **Automatic Initialization**: First time sales is loaded, chat history is saved to localStorage
 - **Persistent History**: Chat history remains in localStorage across sessions
-- **Key**: `sales-session_CHAT`
+- **Key**: `sales-session-v2_CHAT`
 
 ### 🎯 Session Persistence
 - **Auto-Resume Chat**: Refresh the page and continue where you left off
@@ -21,7 +21,7 @@ A scalable, modular chatbot application with **persistent session management** a
 
 1. **User selects "Sales" category**
 2. **Chat initializes**
-3. **Check localStorage** for `sales-session_CHAT`
+3. **Check localStorage** for `sales-session-v2_CHAT`
 4. **Not found** → Initialize with pre-defined chat history
 5. **localStorage created** with 4 messages:
    ```javascript
@@ -48,7 +48,7 @@ A scalable, modular chatbot application with **persistent session management** a
 
 ## 📁 Chat History Structure
 
-The `sales-session_CHAT` localStorage key contains an array of message objects:
+The `sales-session-v2_CHAT` localStorage key contains an array of message objects:
 
 ```javascript
 [
@@ -145,7 +145,7 @@ console.log('Sales history cleared - will be re-initialized next time');
 1. **Clear localStorage** (DevTools → Application → Clear All)
 2. Open the app
 3. Select "Sales" category
-4. **Check localStorage** → Find `sales-session_CHAT`
+4. **Check localStorage** → Find `sales-session-v2_CHAT`
 5. ✅ See 4 pre-loaded messages in JSON format!
 
 ### Test Persistence:
@@ -158,7 +158,7 @@ console.log('Sales history cleared - will be re-initialized next time');
 
 ### Test Re-initialization:
 
-1. **Delete** `sales-session_CHAT` from localStorage
+1. **Delete** `sales-session-v2_CHAT` from localStorage
 2. Select "Sales" category
 3. **Check console** → "Sales session initialized with chat history"
 4. **Check localStorage** → History re-created!
@@ -168,7 +168,7 @@ console.log('Sales history cleared - will be re-initialized next time');
 
 1. Select "Support" category
 2. **Check localStorage**
-3. ✅ No `sales-session_CHAT` created!
+3. ✅ No `sales-session-v2_CHAT` created!
 4. ✅ Only `sabbi_chat_selected_category` updated!
 
 ## 🔐 LocalStorage Keys
@@ -176,7 +176,7 @@ console.log('Sales history cleared - will be re-initialized next time');
 ```
 sabbi_chat_categories              → List of all categories
 sabbi_chat_selected_category       → Current/last selected category
-sales-session_CHAT                 → Sales chat history (array of messages)
+sales-session-v2_CHAT                 → Sales chat history (array of messages)
 ```
 
 ## 🎯 Modified Files
@@ -200,7 +200,7 @@ sales-session_CHAT                 → Sales chat history (array of messages)
 2. Chat initializes
 3. initializeSalesSession() called
 4. localStorage checked → Not found
-5. localStorage['sales-session_CHAT'] = [4 messages]
+5. localStorage['sales-session-v2_CHAT'] = [4 messages]
 6. Console: "Sales session initialized with chat history"
 7. Chat ready with previous messages
 ```
@@ -264,7 +264,7 @@ localStorage.clear();
 
 ### Check if history exists:
 ```javascript
-console.log(localStorage.getItem('sales-session_CHAT'));
+console.log(localStorage.getItem('sales-session-v2_CHAT'));
 ```
 
 ### Check initialization status:

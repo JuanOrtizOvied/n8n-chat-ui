@@ -34,9 +34,9 @@ window.myChatCallbacks = {
   onChatClear: function (data) {
     console.log("Chat cleared:", data);
     const category = localStorage.getItem("sabbi_chat_selected_category");
-    const chat = localStorage.getItem(`${category}-session_CHAT`);
+    const chat = localStorage.getItem(`${category}-session-v2_CHAT`);
 
-    console.log("Chat data -session_CHAT:", chat);
+    console.log("Chat data -session-v2_CHAT:", chat);
 
     // Remove selected category
     localStorage.removeItem("sabbi_chat_selected_category");
@@ -56,7 +56,7 @@ window.myChatCallbacks = {
 
     // Show header and info card
     setTimeout(() => {
-      localStorage.setItem(`${category}-session_CHAT`, chat);
+      localStorage.setItem(`${category}-session-v2_CHAT`, chat);
     }, 250);
   },
 
@@ -76,7 +76,7 @@ export async function initializeChat(category) {
         callbackRegistry: "myChatCallbacks",
         metadata: {
           n8nchatui: {
-            sessionKey: `${category}-session`,
+            sessionKey: `${category}-session-v2`,
           },
           category: category,
           pageType: "help",
@@ -86,11 +86,16 @@ export async function initializeChat(category) {
       });
     };
     
-    
     setState({ chatInitialized: true });
+
+    // If sales category, initialize chat history in localStorage
+    if (category === 'martin') {
+      initializeSalesSession();
+      console.log('Sales session checked/initialized');
+    }
     
     // Check if category has existing session data in localStorage
-    const sessionKey = `${category}-session_CHAT`;
+    const sessionKey = `${category}-session-v2_CHAT`;
     const existingSession = localStorage.getItem(sessionKey);
     
     if (!existingSession) {
@@ -100,7 +105,7 @@ export async function initializeChat(category) {
       Chatbot.sendMessage("Hola! empecemos a crear mi filosofia de inversión.", {
         metadata: {
           n8nchatui: {
-            sessionKey: `${category}-session`,
+            sessionKey: `${category}-session-v2`,
           },
           category: category,
           pageType: "help",
@@ -109,12 +114,6 @@ export async function initializeChat(category) {
       });
     } else {
       console.log(`Existing session found for ${category}, skipping automatic message`);
-    }
-    
-    // If sales category, initialize chat history in localStorage
-    if (category === 'martin') {
-      initializeSalesSession();
-      console.log('Sales session checked/initialized');
     }
     
     // Hide header and info card

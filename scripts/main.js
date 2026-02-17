@@ -22,7 +22,7 @@ function init() {
   attachEventListeners();
   
   // Check if user has a saved category from previous session
-  checkSavedCategory();
+  // checkSavedCategory();
 }
 
 function attachEventListeners() {

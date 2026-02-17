@@ -158,7 +158,7 @@ const SALES_CHAT_HISTORY = {
 
 const STORAGE_KEY = 'sabbi_chat_categories';
 const SELECTED_CATEGORY_KEY = 'sabbi_chat_selected_category';
-const SALES_SESSION_KEY = 'martin-session_CHAT';
+const SALES_SESSION_KEY = 'martin-session-v2_CHAT';
 
 // Load categories from localStorage or use defaults
 export function getCategories() {
