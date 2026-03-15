@@ -1,3 +1,4 @@
+> **_NOTE:_**  DEPRECATED.
 # Sabbi Chat - Vanilla JavaScript Application
 
 A scalable, modular chatbot application with **persistent session management** and **sales chat history** built with vanilla JavaScript.
